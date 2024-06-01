@@ -1,0 +1,111 @@
+<?php
+	include 'includes/session.php';
+	
+	if(isset($_POST['signup'])){
+		$firstname = $_POST['firstname'];
+		$lastname = $_POST['lastname'];
+		$email = $_POST['email'];
+		$password = $_POST['password'];
+		$repassword = $_POST['repassword'];
+
+		$_SESSION['firstname'] = $firstname;
+		$_SESSION['lastname'] = $lastname;
+		$_SESSION['email'] = $email;
+
+		
+
+		if($password != $repassword){
+			$_SESSION['error'] = 'Passwords did not match';
+            header('location: Reseller.php');
+		}
+		else{
+			$conn = $pdo->open();
+
+			$stmt = $conn->prepare("SELECT COUNT(*) AS numrows FROM users WHERE email=:email");
+			$stmt->execute(['email'=>$email]);
+			$row = $stmt->fetch();
+			if($row['numrows'] > 0){
+				$_SESSION['error'] = 'Email already taken';
+                header('location: Reseller.php');
+			}
+			else{
+				$now = date('Y-m-d');
+				$password = password_hash($password, PASSWORD_DEFAULT);
+
+				//generate code
+				$set='123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+				$code=substr(str_shuffle($set), 0, 12);
+                $a='Reseller';
+
+				try{
+					$stmt = $conn->prepare("INSERT INTO users (email, password, firstname, lastname, activate_code, Role, created_on) VALUES (:email, :password, :firstname, :lastname, :code, :re, :now)");
+					$stmt->execute(['email'=>$email, 'password'=>$password, 'firstname'=>$firstname, 'lastname'=>$lastname, 'code'=>$code,'re'=>$a ,'now'=>$now]);
+					$userid = $conn->lastInsertId();
+
+					$message = "
+						<h2>Thank you for Registering.</h2>
+						<p>Your Account:</p>
+						<p>Email: ".$email."</p>
+						<p>Password: ".$_POST['password']."</p>
+						<p>Please click the link below to activate your account.</p>
+						<a href='http://localhost/ecommerce/activate.php?code=".$code."&user=".$userid."'>Activate Account</a>
+					";
+
+					//Load phpmailer
+		    		// require 'vendor/autoload.php';
+
+		    		// $mail = new PHPMailer(true);                       
+				    try {
+				        // //Server settings
+				        // $mail->isSMTP();                                     
+				        // $mail->Host = 'smtp.live.com';                      
+				        // $mail->SMTPAuth = true;                               
+				        // $mail->Username = 'LankaPC21@hotmail.com';     
+				        // $mail->Password = 'Tharshika21$';                                         
+				        // $mail->SMTPSecure = 'tls';                           
+				        // $mail->Port = 587;                                   
+
+				        // $mail->setFrom('LankaPC21@hotmail.com', 'Anu');
+                        // $mail->addAddress( $email, $firstname);
+				       
+				        // //Content
+				        // $mail->isHTML(true);                                  
+				        // $mail->Subject = 'Lanka PC Sign Up';
+				        // $mail->Body    = $message;
+
+				        // $mail->send();
+
+				        unset($_SESSION['firstname']);
+				        unset($_SESSION['lastname']);
+				        unset($_SESSION['email']);
+
+				        $_SESSION['success'] = 'Account created.';
+                        header('location: Reseller.php');
+
+				    } 
+				    catch (Exception $e) {
+				        // $_SESSION['error'] = 'Message could not be sent. Mailer Error: '.$mail->ErrorInfo;
+						$_SESSION['error'] = 'Error';
+				        header('location: Reseller.php');
+				    }
+
+
+				}
+				catch(PDOException $e){
+					$_SESSION['error'] = $e->getMessage();
+					header('location: Reseller.php');
+				}
+
+				$pdo->close();
+
+			}
+
+		}
+
+	}
+	else{
+		$_SESSION['error'] = 'Fill up signup form first';
+		header('location: Reseller.php');
+	}
+
+?>

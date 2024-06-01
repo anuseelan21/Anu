@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+option {
+  background-color: white;
+}
+#cpu_select,
+#gpu_select,
+#ram_select,
+#mb_select,
+#ssd_select,
+#hdd_select,
+#psu_select,
+#cpu_cooler_select {
+  display: none;
+}
+
+
