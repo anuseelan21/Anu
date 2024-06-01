@@ -20,6 +20,6 @@ if (!$database) {
 }
 else{
 
-	echo "Anuseelan"
+	echo "Anuseelan";
 }
 ?>
