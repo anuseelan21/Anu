@@ -1,0 +1,16 @@
+dp_buyer_pp_US_1707988156103636@paypal.com
+
+
+ATHRtG22aBQT4sQzuR_SdXAwTptK5StAjUcC6UriGDH6Zobb5WHjyGKI9rkyoj7-onJK2y1i2JNCSJ5i
+EPmoaDTAZoVBsILgeevQ_TqbAi5TFv62H6392pcO5h--8Q7ctRJkdhwl_hpfCG6pMavbuhREbjtK6cRV
+
+
+Sandbox account : sb-fx47z929578727@business.example.com
+password : Tharshika21
+
+Sandbox account    : sb-sngti29578724@personal.example.com
+password  :  Tharshika21
+
+
+
+Access token : access_token$sandbox$n2jdn22872z449y5$02a9b4d0902e217021a610ba0fce80e7
