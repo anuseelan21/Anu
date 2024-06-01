@@ -1,18 +1,15 @@
 <?php
-// Database connection configuration
-define('DB_SERVER', 'bcas-db.cb8ygmqiui6l.us-east-1.rds.amazonaws.com'); // Hostname of your RDS instance
-define('DB_USERNAME', 'admin'); // Database username
-define('DB_PASSWORD', '12345678'); // Database password
-define('DB_NAME', 'ecomm'); // Database name
+$servername = "bcas-db.cb8ygmqiui6l.us-east-1.rds.amazonaws.com";
+$dbname="ecomm";
+$username = "admin";
+$password = "12345678";
 
 // Create connection
-$database = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+$conn = new mysqli($servername,$dbname, $username, $password,3309);
 
 // Check connection
-if (!$database) {
-    // Log the error instead of showing it to users
-    error_log('Failed to connect to database: ' . mysqli_connect_error());
-    // Display a user-friendly error message
-    die('Error: Unable to connect to database');
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
 }
+echo "Connected successfully";
 ?>
