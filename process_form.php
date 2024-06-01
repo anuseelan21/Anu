@@ -15,22 +15,4 @@ if (!$database) {
     // Display a user-friendly error message
     die('Error: Unable to connect to database');
 }
-
-// Handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = htmlspecialchars($_POST['name']);
-    $email = htmlspecialchars($_POST['email']);
-    $message = htmlspecialchars($_POST['message']);
-
-    // Insert form data into database
-    $sql = "INSERT INTO contacts (name, email, message) VALUES ('$name', '$email', '$message')";
-    if (mysqli_query($database, $sql)) {
-        echo "Message sent successfully!";
-    } else {
-        echo "Error: " . $sql . "<br>" . mysqli_error($database);
-    }
-
-    // Close connection
-    mysqli_close($database);
-}
 ?>
