@@ -1,2 +1,0 @@
-# Anu
-Devops
