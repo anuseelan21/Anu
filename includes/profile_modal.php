@@ -21,7 +21,7 @@
                 </thead>
                 <tbody id="detail">
                   <tr>
-                    <td colspan="3" align="right"><b>Total</b></td>
+                    <td colspan="3" ,align="right"><b>Total</b></td>
                     <td><span id="total"></span></td>
                   </tr>
                 </tbody>
