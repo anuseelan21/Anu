@@ -13,10 +13,6 @@
       <h1>
         Users
       </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Users</li>
-      </ol>
     </section>
 
     <!-- Main content -->
@@ -52,10 +48,7 @@
             <div class="box-body">
               <table id="example1" class="table table-bordered">
                 <thead>
-                  <th>Photo</th>
                   <th>Email</th>
-                  <th>Name</th>
-                  <th>Status</th>
                   <th>Date Added</th>
                   <th>Tools</th>
                 </thead>
@@ -72,21 +65,12 @@
                         $active = (!$row['status']) ? '<span class="pull-right"><a href="#activate" class="status" data-toggle="modal" data-id="'.$row['id'].'"><i class="fa fa-check-square-o"></i></a></span>' : '';
                         echo "
                           <tr>
-                            <td>
-                              <img src='".$image."' height='30px' width='30px'>
-                              <span class='pull-right'><a href='#edit_photo' class='photo' data-toggle='modal' data-id='".$row['id']."'><i class='fa fa-edit'></i></a></span>
-                            </td>
                             <td>".$row['email']."</td>
-                            <td>".$row['firstname'].' '.$row['lastname']."</td>
-                            <td>
-                              ".$status."
-                              ".$active."
-                            </td>
                             <td>".date('M d, Y', strtotime($row['created_on']))."</td>
                             <td>
-                              <a href='cart.php?user=".$row['id']."' class='btn btn-info btn-sm btn-flat'><i class='fa fa-search'></i> Cart</a>
-                              <button class='btn btn-success btn-sm edit btn-flat' data-id='".$row['id']."'><i class='fa fa-edit'></i> Edit</button>
-                              <button class='btn btn-danger btn-sm delete btn-flat' data-id='".$row['id']."'><i class='fa fa-trash'></i> Delete</button>
+                              <a href='cart.php?user=".$row['id']."' class=''><i class=''></i> Cart</a>
+                              <button class='' data-id='".$row['id']."'><i class=''></i> Edit</button>
+                              <button class='' data-id='".$row['id']."'><i class=''></i> Delete</button>
                             </td>
                           </tr>
                         ";

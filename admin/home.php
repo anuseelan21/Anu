@@ -25,11 +25,6 @@
       <h1>
         Dashboard
       </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Dashboard</li>
-        
-      </ol>
     </section>
 
     <!-- Main content -->
@@ -57,102 +52,6 @@
         }
       ?>
       <!-- Small boxes (Stat box) -->
-      <div class="row">
-        <div class="col-lg-3 col-xs-6">
-          <!-- small box -->
-          <div class="small-box bg-aqua">
-            <div class="inner">
-              <?php
-                $stmt = $conn->prepare("SELECT * FROM details LEFT JOIN products ON products.id=details.product_id");
-                $stmt->execute();
-
-                $total = 0;
-                foreach($stmt as $srow){
-                  $subtotal = $srow['price']*$srow['quantity'];
-                  $total += $subtotal;
-                }
-
-                echo "<h3>&#36; ".number_format_short($total, 2)."</h3>";
-              ?>
-              <p>Total Sales</p>
-            </div>
-            <div class="icon">
-              <i class="fa fa-shopping-cart"></i>
-            </div>
-            <a href="book.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-          <!-- small box -->
-          <div class="small-box bg-green">
-            <div class="inner">
-              <?php
-                $stmt = $conn->prepare("SELECT *, COUNT(*) AS numrows FROM products");
-                $stmt->execute();
-                $prow =  $stmt->fetch();
-
-                echo "<h3>".$prow['numrows']."</h3>";
-              ?>
-          
-              <p>Number of Products</p>
-            </div>
-            <div class="icon">
-              <i class="fa fa-barcode"></i>
-            </div>
-            <a href="student.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-          <!-- small box -->
-          <div class="small-box bg-yellow">
-            <div class="inner">
-              <?php
-                $stmt = $conn->prepare("SELECT *, COUNT(*) AS numrows FROM users");
-                $stmt->execute();
-                $urow =  $stmt->fetch();
-
-                echo "<h3>".$urow['numrows']."</h3>";
-              ?>
-             
-              <p>Number of Users</p>
-            </div>
-            <div class="icon">
-              <i class="fa fa-users"></i>
-            </div>
-            <a href="return.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-          <!-- small box -->
-          <div class="small-box bg-red">
-            <div class="inner">
-              <?php
-                $stmt = $conn->prepare("SELECT * FROM details LEFT JOIN sales ON sales.id=details.sales_id LEFT JOIN products ON products.id=details.product_id WHERE sales_date=:sales_date");
-                $stmt->execute(['sales_date'=>$today]);
-
-                $total = 0;
-                foreach($stmt as $trow){
-                  $subtotal = $trow['price']*$trow['quantity'];
-                  $total += $subtotal;
-                }
-
-                echo "<h3>&#36; ".number_format_short($total, 2)."</h3>";
-                
-              ?>
-
-              <p>Sales Today</p>
-            </div>
-            <div class="icon">
-              <i class="fa fa-money"></i>
-            </div>
-            <a href="borrow.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-      </div>
       <!-- /.row -->
       <div class="row">
         <div class="col-xs-12">
@@ -180,8 +79,8 @@
             <div class="box-body">
               <div class="chart">
                 <br>
-                <div id="legend" class="text-center"></div>
-                <canvas id="barChart" style="height:350px"></canvas>
+                <div id="legend" class=""></div>
+                <canvas id="barChart" style="height: 147px;"></canvas>
               </div>
             </div>
           </div>
@@ -237,7 +136,7 @@ $(function(){
     datasets: [
       {
         label               : 'SALES',
-        fillColor           : 'rgba(60,141,188,0.9)',
+        fillColor           : 'rgba(141,141,188,0.9)',
         strokeColor         : 'rgba(60,141,188,0.8)',
         pointColor          : '#3b8bba',
         pointStrokeColor    : 'rgba(60,141,188,1)',
@@ -258,7 +157,7 @@ $(function(){
     //String - Colour of the grid lines
     scaleGridLineColor      : 'rgba(0,0,0,.05)',
     //Number - Width of the grid lines
-    scaleGridLineWidth      : 1,
+    scaleGridLineWidth      : 0.5,
     //Boolean - Whether to show horizontal lines (except X axis)
     scaleShowHorizontalLines: true,
     //Boolean - Whether to show vertical lines (except Y axis)
@@ -266,9 +165,9 @@ $(function(){
     //Boolean - If there is a stroke on each bar
     barShowStroke           : true,
     //Number - Pixel width of the bar stroke
-    barStrokeWidth          : 2,
+    barStrokeWidth          : 1,
     //Number - Spacing between each of the X value sets
-    barValueSpacing         : 5,
+    barValueSpacing         : 2,
     //Number - Spacing between data sets within X values
     barDatasetSpacing       : 1,
     //String - A legend template

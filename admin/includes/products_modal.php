@@ -57,9 +57,9 @@
                   </div>
                 </div>
                 <p><b>Description</b></p>
-                <div class="form-group">
+                <div class="">
                   <div class="col-sm-12">
-                    <textarea id="editor1" name="description" rows="10" cols="80" required></textarea>
+                    <textarea id="" name="description" rows="10" cols="80" required></textarea>
                   </div>
                   
                 </div>

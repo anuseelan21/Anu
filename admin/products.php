@@ -17,16 +17,6 @@
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>
-        Product List
-      </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li>Products</li>
-        <li class="active">Product List</li>
-      </ol>
-    </section>
 
     <!-- Main content -->
     <section class="content">
@@ -60,25 +50,10 @@
               <div class="pull-right">
                 <form class="form-inline">
                   <div class="form-group">
-                    <label>Category: </label>
+                    <!-- <label>Category: </label>
                     <select class="form-control input-sm" id="select_category">
                       <option value="0">ALL</option>
-                      <?php
-                        $conn = $pdo->open();
-
-                        $stmt = $conn->prepare("SELECT * FROM category");
-                        $stmt->execute();
-
-                        foreach($stmt as $crow){
-                          $selected = ($crow['id'] == $catid) ? 'selected' : ''; 
-                          echo "
-                            <option value='".$crow['id']."' ".$selected.">".$crow['name']."</option>
-                          ";
-                        }
-
-                        $pdo->close();
-                      ?>
-                    </select>
+                    </select> -->
                   </div>
                 </form>
               </div>
@@ -87,10 +62,10 @@
               <table id="example1" class="table table-bordered">
                 <thead>
                   <th>Name</th>
-                  <th>Photo</th>
+                  <!-- <th>Photo</th> -->
                   <th>Description</th>
                   <th>Price</th>
-                  <th>Views Today</th>
+                  <!-- <th>Views Today</th> -->
                   <th>Tools</th>
                 </thead>
                 <tbody>
@@ -107,16 +82,11 @@
                         echo "
                           <tr>
                             <td>".$row['name']."</td>
-                            <td>
-                              <img src='".$image."' height='30px' width='30px'>
-                              <span class='pull-right'><a href='#edit_photo' class='photo' data-toggle='modal' data-id='".$row['id']."'><i class='fa fa-edit'></i></a></span>
-                            </td>
-                            <td><a href='#description' data-toggle='modal' class='btn btn-info btn-sm btn-flat desc' data-id='".$row['id']."'><i class='fa fa-search'></i> View</a></td>
+                            <td><a href='#description' data-toggle='modal' class='' data-id='".$row['id']."'><i class=''></i> View</a></td>
                             <td>Rs ".number_format($row['price'], 2)."</td>
-                            <td>".$counter."</td>
                             <td>
-                              <button class='btn btn-success btn-sm edit btn-flat' data-id='".$row['id']."'><i class='fa fa-edit'></i> Edit</button>
-                              <button class='btn btn-danger btn-sm delete btn-flat' data-id='".$row['id']."'><i class='fa fa-trash'></i> Delete</button>
+                              <button class='' data-id='".$row['id']."'><i class=''></i> Edit</button>
+                              <button class='' data-id='".$row['id']."'><i class=''></i> Delete</button>
                             </td>
                           </tr>
                         ";

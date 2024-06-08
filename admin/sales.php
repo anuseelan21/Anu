@@ -13,10 +13,6 @@
       <h1>
         Sales History
       </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Sales</li>
-      </ol>
     </section>
 
     <!-- Main content -->
@@ -31,9 +27,9 @@
                     <div class="input-group-addon">
                       <i class="fa fa-calendar"></i>
                     </div>
-                    <input type="text" class="form-control pull-right col-sm-8" id="reservation" name="date_range">
+                    <!-- <input type="text" class="form-control pull-right col-sm-8" id="reservation" name="date_range"> -->
                   </div>
-                  <button type="submit" class="btn btn-success btn-sm btn-flat" name="print"><span class="glyphicon glyphicon-print"></span> Print</button>
+                  <!-- <button type="submit" class="btn btn-success btn-sm btn-flat" name="print"><span class="glyphicon glyphicon-print"></span> Print</button> -->
                 </form>
               </div>
             </div>
@@ -41,8 +37,6 @@
               <table id="example1" class="table table-bordered">
                 <thead>
                   <th class="hidden"></th>
-                  <th>Date</th>
-                  <th>Buyer Name</th>
                   <th>Transaction#</th>
                   <th>Amount</th>
                   <th>Full Details</th>
@@ -65,11 +59,9 @@
                         echo "
                           <tr>
                             <td class='hidden'></td>
-                            <td>".date('M d, Y', strtotime($row['sales_date']))."</td>
-                            <td>".$row['firstname'].' '.$row['lastname']."</td>
                             <td>".$row['pay_id']."</td>
                             <td>&#36; ".number_format($total, 2)."</td>
-                            <td><button type='button' class='btn btn-info btn-sm btn-flat transact' data-id='".$row['salesid']."'><i class='fa fa-search'></i> View</button></td>
+                            <td><button type='button' class='' data-id='".$row['salesid']."'><i class=''></i> View</button></td>
                           </tr>
                         ";
                       }

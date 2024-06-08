@@ -18,8 +18,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-              <button type="submit" class="btn btn-primary btn-flat" name="add"><i class="fa fa-save"></i> Save</button>
+              <button type="button" class="" data-dismiss="modal"><i class=""></i> Close</button>
+              <button type="submit" class="" name="add"><i class=""></i> Save</button>
               </form>
             </div>
         </div>
@@ -47,8 +47,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-              <button type="submit" class="btn btn-success btn-flat" name="edit"><i class="fa fa-check-square-o"></i> Update</button>
+              <button type="button" class="" data-dismiss="modal"><i class=""></i> Close</button>
+              <button type="submit" class="" name="edit"><i class=""></i> Update</button>
               </form>
             </div>
         </div>
@@ -73,8 +73,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-              <button type="submit" class="btn btn-danger btn-flat" name="delete"><i class="fa fa-trash"></i> Delete</button>
+              <button type="button" class="" data-dismiss="modal"><i class=""></i> Close</button>
+              <button type="submit" class="" name="delete"><i class=""></i> Delete</button>
               </form>
             </div>
         </div>
