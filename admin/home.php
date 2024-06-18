@@ -24,11 +24,6 @@
       <h1>
         Dashboard
       </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Dashboard</li>
-        
-      </ol>
     </section>
     <!-- Main content -->
     <section class="content">
@@ -55,6 +50,7 @@
         }
       ?>
       <!-- Small boxes (Stat box) -->
+<<<<<<< HEAD
       <div class="row">
         <div class="col-lg-3 col-xs-6">
           <!-- small box -->
@@ -151,6 +147,8 @@
         </div>
         <!-- ./col -->
       </div>
+=======
+>>>>>>> ac630c5aaf8fd7fee17960c2232cd0b2c322ff15
       <!-- /.row -->
       <div class="row">
         <div class="col-xs-12">
@@ -178,8 +176,8 @@
             <div class="box-body">
               <div class="chart">
                 <br>
-                <div id="legend" class="text-center"></div>
-                <canvas id="barChart" style="height:350px"></canvas>
+                <div id="legend" class=""></div>
+                <canvas id="barChart" style="height: 147px;"></canvas>
               </div>
             </div>
           </div>
@@ -235,7 +233,7 @@ $(function(){
     datasets: [
       {
         label               : 'SALES',
-        fillColor           : 'rgba(60,141,188,0.9)',
+        fillColor           : 'rgba(141,141,188,0.9)',
         strokeColor         : 'rgba(60,141,188,0.8)',
         pointColor          : '#3b8bba',
         pointStrokeColor    : 'rgba(60,141,188,1)',
@@ -256,7 +254,7 @@ $(function(){
     //String - Colour of the grid lines
     scaleGridLineColor      : 'rgba(0,0,0,.05)',
     //Number - Width of the grid lines
-    scaleGridLineWidth      : 1,
+    scaleGridLineWidth      : 0.5,
     //Boolean - Whether to show horizontal lines (except X axis)
     scaleShowHorizontalLines: true,
     //Boolean - Whether to show vertical lines (except Y axis)
@@ -264,9 +262,9 @@ $(function(){
     //Boolean - If there is a stroke on each bar
     barShowStroke           : true,
     //Number - Pixel width of the bar stroke
-    barStrokeWidth          : 2,
+    barStrokeWidth          : 1,
     //Number - Spacing between each of the X value sets
-    barValueSpacing         : 5,
+    barValueSpacing         : 2,
     //Number - Spacing between data sets within X values
     barDatasetSpacing       : 1,
     //String - A legend template
