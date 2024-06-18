@@ -1,4 +1,7 @@
-<?php include 'includes/session.php'; ?>
+<?php 
+  include 'includes/session.php';
+  include 'includes/format.php'; 
+?>
 <?php
   $where = '';
   if(isset($_GET['category'])){
@@ -6,6 +9,14 @@
     $where = 'WHERE category_id ='.$catid;
   }
 
+?>
+<?php 
+  $today = date('Y-m-d');
+  $year = date('Y');
+  if(isset($_GET['year'])){
+    $year = $_GET['year'];
+  }
+  $conn = $pdo->open();
 ?>
 <?php include 'includes/header.php'; ?>
 <body class="hold-transition skin-blue sidebar-mini">
@@ -19,17 +30,15 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Product List
+      Total Sales
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li>Products</li>
-        <li class="active">Product List</li>
+        <li class="active">Total Sales</li>
+        
       </ol>
     </section>
-
     <!-- Main content -->
-    <section class="content">
       <?php
         if(isset($_SESSION['error'])){
           echo "
@@ -52,38 +61,105 @@
           unset($_SESSION['success']);
         }
       ?>
+      <!-- Small boxes (Stat box) -->
       <div class="row">
-        <div class="col-xs-12">
-          <div class="box">
-            <div class="box-header with-border">
-              <a href="#addnew" data-toggle="modal" class="btn btn-primary btn-sm btn-flat" id="addproduct"><i class="fa fa-plus"></i> New</a>
-              <div class="pull-right">
-                <form class="form-inline">
-                  <div class="form-group">
-                    <label>Category: </label>
-                    <select class="form-control input-sm" id="select_category">
-                      <option value="0">ALL</option>
-                      <?php
-                        $conn = $pdo->open();
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-aqua">
+            <div class="inner">
+              <?php
+                $stmt = $conn->prepare("SELECT * FROM details LEFT JOIN products ON products.id=details.product_id");
+                $stmt->execute();
 
-                        $stmt = $conn->prepare("SELECT * FROM category");
-                        $stmt->execute();
+                $total = 0;
+                foreach($stmt as $srow){
+                  $subtotal = $srow['price']*$srow['quantity'];
+                  $total += $subtotal;
+                }
 
-                        foreach($stmt as $crow){
-                          $selected = ($crow['id'] == $catid) ? 'selected' : ''; 
-                          echo "
-                            <option value='".$crow['id']."' ".$selected.">".$crow['name']."</option>
-                          ";
-                        }
-
-                        $pdo->close();
-                      ?>
-                    </select>
-                  </div>
-                </form>
-              </div>
+                echo "<h3>&#36; ".number_format_short($total, 2)."</h3>";
+              ?>
+              <p>Total Sales</p>
             </div>
-            <div class="box-body">
+            <div class="icon">
+              <i class="fa fa-shopping-cart"></i>
+            </div>
+            <a href="book.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-green">
+            <div class="inner">
+              <?php
+                $stmt = $conn->prepare("SELECT *, COUNT(*) AS numrows FROM products");
+                $stmt->execute();
+                $prow =  $stmt->fetch();
+
+                echo "<h3>".$prow['numrows']."</h3>";
+              ?>
+          
+              <p>Number of Products</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-barcode"></i>
+            </div>
+            <a href="noproduct.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <?php
+                $stmt = $conn->prepare("SELECT *, COUNT(*) AS numrows FROM users");
+                $stmt->execute();
+                $urow =  $stmt->fetch();
+
+                echo "<h3>".$urow['numrows']."</h3>";
+              ?>
+             
+              <p>Number of Users</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-users"></i>
+            </div>
+            <a href="nousers.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-red">
+            <div class="inner">
+              <?php
+                $stmt = $conn->prepare("SELECT * FROM details LEFT JOIN sales ON sales.id=details.sales_id LEFT JOIN products ON products.id=details.product_id WHERE sales_date=:sales_date");
+                $stmt->execute(['sales_date'=>$today]);
+
+                $total = 0;
+                foreach($stmt as $trow){
+                  $subtotal = $trow['price']*$trow['quantity'];
+                  $total += $subtotal;
+                }
+
+                echo "<h3>&#36; ".number_format_short($total, 2)."</h3>";
+                
+              ?>
+
+              <p>Sales Today</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-money"></i>
+            </div>
+            <a href="todysale.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+      </div>
+      <!-- space  -->
+      <div class="box-body">
               <table id="example1" class="table table-bordered">
                 <thead>
                   <th>Name</th>
@@ -132,19 +208,18 @@
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-     
-  </div>
-  	<?php include 'includes/footer.php'; ?>
+      </section>
+      <!-- right col -->
+      <?php include 'includes/footer.php'; ?>
     <?php include 'includes/products_modal.php'; ?>
     <?php include 'includes/products_modal2.php'; ?>
 
+    </div>
+  	<?php include 'includes/footer.php'; ?>
+
 </div>
 <!-- ./wrapper -->
-
+<?php $pdo->close(); ?>
 <?php include 'includes/scripts.php'; ?>
 <script>
 $(function(){

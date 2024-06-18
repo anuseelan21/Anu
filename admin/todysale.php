@@ -22,16 +22,15 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Dashboard
+      Total Sales
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Dashboard</li>
+        <li class="active">Total Sales</li>
         
       </ol>
     </section>
     <!-- Main content -->
-    <section class="content">
       <?php
         if(isset($_SESSION['error'])){
           echo "
@@ -152,35 +151,85 @@
         <!-- ./col -->
       </div>
       <!-- /.row -->
+      <!-- <section class="content"> -->
       <div class="row">
         <div class="col-xs-12">
           <div class="box">
             <div class="box-header with-border">
-              <h3 class="box-title">Monthly Sales Report</h3>
-              <div class="box-tools pull-right">
-                <form class="form-inline">
-                  <div class="form-group">
-                    <label>Select Year: </label>
-                    <select class="form-control input-sm" id="select_year">
-                      <?php
-                        for($i=2015; $i<=2065; $i++){
-                          $selected = ($i==$year)?'selected':'';
-                          echo "
-                            <option value='".$i."' ".$selected.">".$i."</option>
-                          ";
-                        }
-                      ?>
-                    </select>
+              <div class="pull-right">
+                <form method="POST" class="form-inline" action="sales_print.php">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right col-sm-8" id="reservation" name="date_range">
                   </div>
+                  <button type="submit" class="btn btn-success btn-sm btn-flat" name="print"><span class="glyphicon glyphicon-print"></span> Print</button>
                 </form>
               </div>
             </div>
             <div class="box-body">
-              <div class="chart">
-                <br>
-                <div id="legend" class="text-center"></div>
-                <canvas id="barChart" style="height:350px"></canvas>
-              </div>
+              <table id="example1" class="table table-bordered">
+                <thead>
+                  <th class="hidden"></th>
+                  <th>Date</th>
+                  <th>Buyer Name</th>
+                  <th>Transaction#</th>
+                  <th>Amount</th>
+                  <th>Full Details</th>
+                </thead>
+                <tbody>
+                  <?php
+                    $conn = $pdo->open();
+
+                    try {
+                        // Get the current date
+                        $currentDate = date('Y-m-d');
+                    
+                        // Prepare the statement to get sales for the current date
+                        $stmt = $conn->prepare("SELECT *, sales.id AS salesid FROM sales 
+                                                LEFT JOIN users ON users.id=sales.user_id 
+                                                WHERE DATE(sales_date) = :currentDate 
+                                                ORDER BY sales_date DESC");
+                        $stmt->execute(['currentDate' => $currentDate]);
+                    
+                        $totalSales = 0;
+                    
+                        foreach ($stmt as $row) {
+                            // Prepare the statement to get details for each sale
+                            $detailsStmt = $conn->prepare("SELECT * FROM details 
+                                                           LEFT JOIN products ON products.id=details.product_id 
+                                                           WHERE details.sales_id=:id");
+                            $detailsStmt->execute(['id' => $row['salesid']]);
+                            
+                            $total = 0;
+                    
+                            foreach ($detailsStmt as $details) {
+                                $subtotal = $details['price'] * $details['quantity'];
+                                $total += $subtotal;
+                            }
+                    
+                            $totalSales += $total;
+                        echo "
+                          <tr>
+                            <td class='hidden'></td>
+                            <td>".date('M d, Y', strtotime($row['sales_date']))."</td>
+                            <td>".$row['firstname'].' '.$row['lastname']."</td>
+                            <td>".$row['pay_id']."</td>
+                            <td>&#36; ".number_format($total, 2)."</td>
+                            <td><button type='button' class='btn btn-info btn-sm btn-flat transact' data-id='".$row['salesid']."'><i class='fa fa-search'></i> View</button></td>
+                          </tr>
+                        ";
+                      }
+                    }
+                    catch(PDOException $e){
+                      echo $e->getMessage();
+                    }
+
+                    $pdo->close();
+                  ?>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -193,98 +242,73 @@
 
 </div>
 <!-- ./wrapper -->
-
-<!-- Chart Data -->
-<?php
-  $months = array();
-  $sales = array();
-  for( $m = 1; $m <= 12; $m++ ) {
-    try{
-      $stmt = $conn->prepare("SELECT * FROM details LEFT JOIN sales ON sales.id=details.sales_id LEFT JOIN products ON products.id=details.product_id WHERE MONTH(sales_date)=:month AND YEAR(sales_date)=:year");
-      $stmt->execute(['month'=>$m, 'year'=>$year]);
-      $total = 0;
-      foreach($stmt as $srow){
-        $subtotal = $srow['price']*$srow['quantity'];
-        $total += $subtotal;    
-      }
-      array_push($sales, round($total, 2));
-    }
-    catch(PDOException $e){
-      echo $e->getMessage();
-    }
-
-    $num = str_pad( $m, 2, 0, STR_PAD_LEFT );
-    $month =  date('M', mktime(0, 0, 0, $m, 1));
-    array_push($months, $month);
-  }
-
-  $months = json_encode($months);
-  $sales = json_encode($sales);
-
-?>
-<!-- End Chart Data -->
-
 <?php $pdo->close(); ?>
 <?php include 'includes/scripts.php'; ?>
+<!-- Date Picker -->
 <script>
 $(function(){
-  var barChartCanvas = $('#barChart').get(0).getContext('2d')
-  var barChart = new Chart(barChartCanvas)
-  var barChartData = {
-    labels  : <?php echo $months; ?>,
-    datasets: [
-      {
-        label               : 'SALES',
-        fillColor           : 'rgba(60,141,188,0.9)',
-        strokeColor         : 'rgba(60,141,188,0.8)',
-        pointColor          : '#3b8bba',
-        pointStrokeColor    : 'rgba(60,141,188,1)',
-        pointHighlightFill  : '#fff',
-        pointHighlightStroke: 'rgba(60,141,188,1)',
-        data                : <?php echo $sales; ?>
-      }
-    ]
-  }
-  //barChartData.datasets[1].fillColor   = '#00a65a'
-  //barChartData.datasets[1].strokeColor = '#00a65a'
-  //barChartData.datasets[1].pointColor  = '#00a65a'
-  var barChartOptions                  = {
-    //Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
-    scaleBeginAtZero        : true,
-    //Boolean - Whether grid lines are shown across the chart
-    scaleShowGridLines      : true,
-    //String - Colour of the grid lines
-    scaleGridLineColor      : 'rgba(0,0,0,.05)',
-    //Number - Width of the grid lines
-    scaleGridLineWidth      : 1,
-    //Boolean - Whether to show horizontal lines (except X axis)
-    scaleShowHorizontalLines: true,
-    //Boolean - Whether to show vertical lines (except Y axis)
-    scaleShowVerticalLines  : true,
-    //Boolean - If there is a stroke on each bar
-    barShowStroke           : true,
-    //Number - Pixel width of the bar stroke
-    barStrokeWidth          : 2,
-    //Number - Spacing between each of the X value sets
-    barValueSpacing         : 5,
-    //Number - Spacing between data sets within X values
-    barDatasetSpacing       : 1,
-    //String - A legend template
-    legendTemplate          : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].fillColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>',
-    //Boolean - whether to make the chart responsive
-    responsive              : true,
-    maintainAspectRatio     : true
-  }
+  //Date picker
+  $('#datepicker_add').datepicker({
+    autoclose: true,
+    format: 'yyyy-mm-dd'
+  })
+  $('#datepicker_edit').datepicker({
+    autoclose: true,
+    format: 'yyyy-mm-dd'
+  })
 
-  barChartOptions.datasetFill = false
-  var myChart = barChart.Bar(barChartData, barChartOptions)
-  document.getElementById('legend').innerHTML = myChart.generateLegend();
+  //Timepicker
+  $('.timepicker').timepicker({
+    showInputs: false
+  })
+
+  //Date range picker
+  $('#reservation').daterangepicker()
+  //Date range picker with time picker
+  $('#reservationtime').daterangepicker({ timePicker: true, timePickerIncrement: 30, format: 'MM/DD/YYYY h:mm A' })
+  //Date range as a button
+  $('#daterange-btn').daterangepicker(
+    {
+      ranges   : {
+        'Today'       : [moment(), moment()],
+        'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+        'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+      },
+      startDate: moment().subtract(29, 'days'),
+      endDate  : moment()
+    },
+    function (start, end) {
+      $('#daterange-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+    }
+  )
+  
 });
 </script>
 <script>
 $(function(){
-  $('#select_year').change(function(){
-    window.location.href = 'home.php?year='+$(this).val();
+  $(document).on('click', '.transact', function(e){
+    e.preventDefault();
+    $('#transaction').modal('show');
+    var id = $(this).data('id');
+    $.ajax({
+      type: 'POST',
+      url: 'transact.php',
+      data: {id:id},
+      dataType: 'json',
+      success:function(response){
+        $('#date').html(response.date);
+        $('#transid').html(response.transaction);
+        $('#detail').prepend(response.list);
+        $('#total').html(response.total);
+      }
+    });
+  });
+
+  $("#transaction").on("hidden.bs.modal", function () {
+      $('.prepend_items').remove();
   });
 });
 </script>

@@ -2,6 +2,14 @@
   include 'includes/session.php';
   include 'includes/format.php'; 
 ?>
+<?php
+  $where = '';
+  if(isset($_GET['category'])){
+    $catid = $_GET['category'];
+    $where = 'WHERE category_id ='.$catid;
+  }
+
+?>
 <?php 
   $today = date('Y-m-d');
   $year = date('Y');
@@ -22,16 +30,15 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Dashboard
+      Total Sales
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Dashboard</li>
+        <li class="active">Total Sales</li>
         
       </ol>
     </section>
     <!-- Main content -->
-    <section class="content">
       <?php
         if(isset($_SESSION['error'])){
           echo "
@@ -151,142 +158,127 @@
         </div>
         <!-- ./col -->
       </div>
-      <!-- /.row -->
+      <!-- space  -->
       <div class="row">
         <div class="col-xs-12">
           <div class="box">
             <div class="box-header with-border">
-              <h3 class="box-title">Monthly Sales Report</h3>
-              <div class="box-tools pull-right">
-                <form class="form-inline">
-                  <div class="form-group">
-                    <label>Select Year: </label>
-                    <select class="form-control input-sm" id="select_year">
-                      <?php
-                        for($i=2015; $i<=2065; $i++){
-                          $selected = ($i==$year)?'selected':'';
-                          echo "
-                            <option value='".$i."' ".$selected.">".$i."</option>
-                          ";
-                        }
-                      ?>
-                    </select>
-                  </div>
-                </form>
-              </div>
+              <a href="#addnew" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> New</a>
             </div>
             <div class="box-body">
-              <div class="chart">
-                <br>
-                <div id="legend" class="text-center"></div>
-                <canvas id="barChart" style="height:350px"></canvas>
-              </div>
+              <table id="example1" class="table table-bordered">
+                <thead>
+                  <th>Photo</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Status</th>
+                  <th>Date Added</th>
+                  <th>Tools</th>
+                </thead>
+                <tbody>
+                  <?php
+                    $conn = $pdo->open();
+
+                    try{
+                      $stmt = $conn->prepare("SELECT * FROM users WHERE type=:type");
+                      $stmt->execute(['type'=>0]);
+                      foreach($stmt as $row){
+                        $image = (!empty($row['photo'])) ? '../images/'.$row['photo'] : '../images/profile.jpg';
+                        $status = ($row['status']) ? '<span class="label label-success">active</span>' : '<span class="label label-danger">not verified</span>';
+                        $active = (!$row['status']) ? '<span class="pull-right"><a href="#activate" class="status" data-toggle="modal" data-id="'.$row['id'].'"><i class="fa fa-check-square-o"></i></a></span>' : '';
+                        echo "
+                          <tr>
+                            <td>
+                              <img src='".$image."' height='30px' width='30px'>
+                              <span class='pull-right'><a href='#edit_photo' class='photo' data-toggle='modal' data-id='".$row['id']."'><i class='fa fa-edit'></i></a></span>
+                            </td>
+                            <td>".$row['email']."</td>
+                            <td>".$row['firstname'].' '.$row['lastname']."</td>
+                            <td>
+                              ".$status."
+                              ".$active."
+                            </td>
+                            <td>".date('M d, Y', strtotime($row['created_on']))."</td>
+                            <td>
+                              <a href='cart.php?user=".$row['id']."' class='btn btn-info btn-sm btn-flat'><i class='fa fa-search'></i> Cart</a>
+                              <button class='btn btn-success btn-sm edit btn-flat' data-id='".$row['id']."'><i class='fa fa-edit'></i> Edit</button>
+                              <button class='btn btn-danger btn-sm delete btn-flat' data-id='".$row['id']."'><i class='fa fa-trash'></i> Delete</button>
+                            </td>
+                          </tr>
+                        ";
+                      }
+                    }
+                    catch(PDOException $e){
+                      echo $e->getMessage();
+                    }
+
+                    $pdo->close();
+                  ?>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-      </div>
-
-      </section>
+      </div>    
+                       </section>
       <!-- right col -->
     </div>
   	<?php include 'includes/footer.php'; ?>
+      <?php include 'includes/users_modal.php'; ?>
 
 </div>
 <!-- ./wrapper -->
-
-<!-- Chart Data -->
-<?php
-  $months = array();
-  $sales = array();
-  for( $m = 1; $m <= 12; $m++ ) {
-    try{
-      $stmt = $conn->prepare("SELECT * FROM details LEFT JOIN sales ON sales.id=details.sales_id LEFT JOIN products ON products.id=details.product_id WHERE MONTH(sales_date)=:month AND YEAR(sales_date)=:year");
-      $stmt->execute(['month'=>$m, 'year'=>$year]);
-      $total = 0;
-      foreach($stmt as $srow){
-        $subtotal = $srow['price']*$srow['quantity'];
-        $total += $subtotal;    
-      }
-      array_push($sales, round($total, 2));
-    }
-    catch(PDOException $e){
-      echo $e->getMessage();
-    }
-
-    $num = str_pad( $m, 2, 0, STR_PAD_LEFT );
-    $month =  date('M', mktime(0, 0, 0, $m, 1));
-    array_push($months, $month);
-  }
-
-  $months = json_encode($months);
-  $sales = json_encode($sales);
-
-?>
-<!-- End Chart Data -->
-
 <?php $pdo->close(); ?>
 <?php include 'includes/scripts.php'; ?>
 <script>
 $(function(){
-  var barChartCanvas = $('#barChart').get(0).getContext('2d')
-  var barChart = new Chart(barChartCanvas)
-  var barChartData = {
-    labels  : <?php echo $months; ?>,
-    datasets: [
-      {
-        label               : 'SALES',
-        fillColor           : 'rgba(60,141,188,0.9)',
-        strokeColor         : 'rgba(60,141,188,0.8)',
-        pointColor          : '#3b8bba',
-        pointStrokeColor    : 'rgba(60,141,188,1)',
-        pointHighlightFill  : '#fff',
-        pointHighlightStroke: 'rgba(60,141,188,1)',
-        data                : <?php echo $sales; ?>
-      }
-    ]
-  }
-  //barChartData.datasets[1].fillColor   = '#00a65a'
-  //barChartData.datasets[1].strokeColor = '#00a65a'
-  //barChartData.datasets[1].pointColor  = '#00a65a'
-  var barChartOptions                  = {
-    //Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
-    scaleBeginAtZero        : true,
-    //Boolean - Whether grid lines are shown across the chart
-    scaleShowGridLines      : true,
-    //String - Colour of the grid lines
-    scaleGridLineColor      : 'rgba(0,0,0,.05)',
-    //Number - Width of the grid lines
-    scaleGridLineWidth      : 1,
-    //Boolean - Whether to show horizontal lines (except X axis)
-    scaleShowHorizontalLines: true,
-    //Boolean - Whether to show vertical lines (except Y axis)
-    scaleShowVerticalLines  : true,
-    //Boolean - If there is a stroke on each bar
-    barShowStroke           : true,
-    //Number - Pixel width of the bar stroke
-    barStrokeWidth          : 2,
-    //Number - Spacing between each of the X value sets
-    barValueSpacing         : 5,
-    //Number - Spacing between data sets within X values
-    barDatasetSpacing       : 1,
-    //String - A legend template
-    legendTemplate          : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].fillColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>',
-    //Boolean - whether to make the chart responsive
-    responsive              : true,
-    maintainAspectRatio     : true
-  }
 
-  barChartOptions.datasetFill = false
-  var myChart = barChart.Bar(barChartData, barChartOptions)
-  document.getElementById('legend').innerHTML = myChart.generateLegend();
-});
-</script>
-<script>
-$(function(){
-  $('#select_year').change(function(){
-    window.location.href = 'home.php?year='+$(this).val();
+  $(document).on('click', '.edit', function(e){
+    e.preventDefault();
+    $('#edit').modal('show');
+    var id = $(this).data('id');
+    getRow(id);
   });
+
+  $(document).on('click', '.delete', function(e){
+    e.preventDefault();
+    $('#delete').modal('show');
+    var id = $(this).data('id');
+    getRow(id);
+  });
+
+  $(document).on('click', '.photo', function(e){
+    e.preventDefault();
+    var id = $(this).data('id');
+    getRow(id);
+  });
+
+  $(document).on('click', '.status', function(e){
+    e.preventDefault();
+    var id = $(this).data('id');
+    getRow(id);
+  });
+
 });
+
+function getRow(id){
+  $.ajax({
+    type: 'POST',
+    url: 'users_row.php',
+    data: {id:id},
+    dataType: 'json',
+    success: function(response){
+      $('.userid').val(response.id);
+      $('#edit_email').val(response.email);
+      $('#edit_password').val(response.password);
+      $('#edit_firstname').val(response.firstname);
+      $('#edit_lastname').val(response.lastname);
+      $('#edit_address').val(response.address);
+      $('#edit_contact').val(response.contact_info);
+      $('.fullname').html(response.firstname+' '+response.lastname);
+    }
+  });
+}
 </script>
 </body>
 </html>
